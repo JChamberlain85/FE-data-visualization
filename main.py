@@ -1,43 +1,31 @@
-import pandas as pd
-import csv
-import tkinter as tk
-import threading
-import time
+import socket
 
-testdata = pd.read_csv('fe_sample.csv')
+sock = socket.socket()
 
-def update_data():
-    while True:
-        testdata = pd.read_csv('fe_sample.csv')  # Fetch latest price
-        time_var.set(f"{testdata.iat[-1, 0]} seconds")  # Update label with current data
-        #time.sleep(5)  # Update every 5 seconds
+ip = "192.168.4.1"
+port = 80
 
-# threading to receive live data
-def start_tracking():
-    threading.Thread(target=update_data, daemon=True).start()
+sock.connect((ip, port))
+print(f"Connected to {ip}")
 
-row_count = sum(1 for row in testdata)
+data_buffer = []
+target_count = 71 # 0 to 70 is 71 numbers
 
-window = tk.Tk() # instantiate an instance of a window
-window.geometry('500x500')
-window.title('FE Car Data')
+while True:
+    #Send connection message to esp
+    sock.send(b"1") 
+    packet = sock.recv(1024) 
+    
+    if not packet:
+        print("Connection closed by ESP32")
+        break
 
-#icon = PhotoImage() ##changes icon in top corner
+    for byte_val in packet:
+        data_buffer.append(byte_val)
 
-frame = tk.Frame(window)
-frame.config(width=250, height=250, borderwidth=2, relief='sunken')
-frame.pack()
+        # Full set check
+        if len(data_buffer) == target_count:
+            print(f"{data_buffer}")
 
-time_label = tk.Label(frame, text='Time:')
-time_label.pack()
-
-time_var = tk.StringVar(value = testdata.iat[-1, 0])
-time_data = tk.Label(frame, textvariable = time_var)
-time_data.pack(pady = 20)
-
-start_button = tk.Button(frame, text="Start Tracking", command=start_tracking)
-start_button.pack()
-
-
-
-window.mainloop() # places window in computer screen
+            # Reset
+            data_buffer.clear()
