@@ -4,19 +4,13 @@ import tkinter as tk
 import threading
 import time
 import socket
+import esp
 
-testdata = pd.read_csv('fe_sample.csv')
-
-def update_data():
-    while True:
-        testdata = pd.read_csv('fe_sample.csv')  # Fetch latest price
-        time_var.set(f"{testdata.iat[-1, 0]} seconds")  # Update label with current data
 
 # threading to receive live data
 def start_tracking():
-    threading.Thread(target=update_data, daemon=True).start()
+    threading.Thread(target=esp.receive_data(), daemon=True).start()
 
-row_count = sum(1 for row in testdata)
 
 window = tk.Tk() # instantiate an instance of a window
 window.geometry('500x500')
@@ -31,9 +25,9 @@ frame.pack()
 time_label = tk.Label(frame, text='Time:')
 time_label.pack()
 
-time_var = tk.StringVar(value = testdata.iat[-1, 0])
-time_data = tk.Label(frame, textvariable = time_var)
-time_data.pack(pady = 20)
+#time_var = tk.StringVar(value = testdata.iat[-1, 0])
+#time_data = tk.Label(frame, textvariable = time_var)
+#time_data.pack(pady = 20)
 
 start_button = tk.Button(frame, text="Start Tracking", command=start_tracking)
 start_button.pack()
