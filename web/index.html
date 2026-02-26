@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telemetry Dashboard</title>
+    <script type="text/javascript" src="/eel.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e1e; color: #fff; padding: 20px; }
+        
+        #header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #status { padding: 5px 15px; border-radius: 5px; font-weight: bold; background: #333; }
+        
+        /* Grid Layout */
+        #dashboard { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 10px; 
+        }
+
+        .card {
+            background: #2d2d2d;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+
+        .label { font-size: 12px; color: #aaa; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .value { font-size: 20px; font-weight: bold; color: #4CAF50; }
+        
+        /* Special highlighting */
+        .highlight { color: #ff5722; }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h2>FE Car Data</h2>
+        <div id="status" style="color: yellow;">Connecting...</div>
+    </div>
+
+    <div id="dashboard">
+        </div>
+
+    <script>
+        // Copy of columns from your CSV to generate labels automatically
+        const columnNames = [
+            'Time', 'Suspension FR', 'Wheel Spd FR', 'Rotor Tmp FR', 'Wheel Tmp FR', 
+            'Steering Ang', 'Suspension FL', 'Wheel Spd FL', 'Rotor Tmp FL', 'Wheel Tmp FL', 
+            'Air Pres FL', 'Suspension BR', 'Wheel Spd BR', 'Rotor Tmp BR', 'Wheel Tmp BR', 
+            'Air Pres BR', 'Suspension BL', 'Wheel Spd BL', 'Rotor Tmp BL', 'Wheel Tmp BL', 
+            'Fluid Tmp BL', 'Fuse 1', 'Fuse 2', 'Fuse 3', 'Fuse 4', 'Fuse 5', 'Fuse 6', 
+            'Fuse 7', 'Fuse 8', 'Fuse 9', 'Fuse 10', 'Fuse 11', 'Fuse 12', 'Fuse 13', 
+            'Throttle 1 Raw', 'Throttle 2 Raw', 'Throttle 1', 'Throttle 2', 'Front Brake', 
+            'Rear Brake', 'MC Temp', 'Motor Temp', 'Batt Temp', 'LV Batt Temp', 'Motor Spd', 
+            'Batt Volt', 'Drive Mode', 'Ign 1', 'Ign 2', 'AMS Fault', 'IMD Fault', 'BSPD Fault', 
+            'Brake Light', 'Phase A', 'Phase B', 'Phase C', 'DC Bus', 'Cmd Torque', 'Torque Fbk', 
+            'Soft Plaus', 'High Sense', 'Car State', 'QBAI', 'Plaus Fault', 'Hard Brake', 
+            'Shut Down', 'Batt SOC', 'Batt Curr', 'Torque', 'Throt Diff', 'Extra 1'
+        ];
+
+        const container = document.getElementById('dashboard');
+
+        // Initialize the Grid
+        function initGrid() {
+            container.innerHTML = "";
+            columnNames.forEach((name, index) => {
+                let div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <div class="label" title="${name}">${name}</div>
+                    <div class="value" id="val-${index}">-</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        initGrid();
+
+        // --- Functions called by Python ---
+
+        eel.expose(update_status);
+        function update_status(msg, color) {
+            const el = document.getElementById('status');
+            el.innerText = msg;
+            el.style.color = color;
+        }
+
+        eel.expose(update_sensor_data);
+        function update_sensor_data(data) {
+            // Data is an array of numbers [v1, v2, v3...]
+            for (let i = 0; i < data.length; i++) {
+                const el = document.getElementById(`val-${i}`);
+                if (el) {
+                    el.innerText = data[i];
+                }
+            }
+        }
+    </script>
+</body>
+</html>
