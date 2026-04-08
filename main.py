@@ -156,18 +156,28 @@ def background_data_collection():
                         if len(data_buffer) == TARGET_COUNT:
                             #Save to CSV
                             writer.writerow(data_buffer)
+                            f.flush()
                             
                             #Update GUI
                             eel.update_sensor_data(data_buffer)
-                            
                             data_buffer.clear()
 
+                #Exception handling
                 except socket.error as e:
                     print(f"Socket error: {e}")
                     eel.update_status(f"Error: {e}", "r")
                     break
     finally:
         sock.close()
+    
+@eel.expose
+def get_csv_data():
+    try:
+        # Open in read mode and return the entire string content
+        with open(CSV_FILE, 'r') as file:
+            return file.read()
+    except Exception as e:
+        return f"Error: {e}"
 
 if __name__ == '__main__':
     #Start data thread
@@ -178,7 +188,5 @@ if __name__ == '__main__':
     try:
         eel.start('index.html', mode='default', size=(1000, 800), block=False)
 
-        while True:
-            eel.sleep(1.0)
     except (SystemExit, KeyboardInterrupt):
         print("Closing App...")
