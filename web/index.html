@@ -8,7 +8,8 @@
 
 <style>
     body {
-        background-image: url('le_car.png');
+        background-color: black;
+        /*background-image: url('le_car.png');*/
         background-size: cover; 
         background-repeat: no-repeat; 
         background-attachment: fixed; 
@@ -105,66 +106,89 @@
         <button onclick="showPage('page5')">Safety/Faults</button>
         <button onclick="showPage('page6')">MISC Sensors</button>
         <button onclick="showPage('page7')">Fuses</button>
-        <button onclick="showPage('page8')">Main</button>
+        <button onclick="showPage('page8')">File Transfer</button>
+        <button onclick="showPage('page9')">Code Switch</button>
+        <button onclick="showPage('page10')">Live Data</button>
+
     </div>
     <div id="status" style="color: yellow;">Connecting...</div>
 </div>
 
-<!-- PAGE 1 -->
+<!-- PAGE 1 - Driver + Wheel Sensors -->
 <div id="page1" class="page active">
     <div id="dashboard-page1" class="dashboard"></div>
 </div>
 
-<!-- PAGE 2 -->
+<!-- PAGE 2 - Thermals -->
 <div id="page2" class="page">
     <div id="dashboard-page2" class="dashboard"></div>
 </div>
-<!-- PAGE 3 -->
-<div id="page3" class="page active">
+
+<!-- PAGE 3 - Electricals/Powertrain -->
+<div id="page3" class="page">
     <div id="dashboard-page3" class="dashboard"></div>
 </div>
 
-<!-- PAGE 4 -->
+<!-- PAGE 4 - Driver Inputs -->
 <div id="page4" class="page">
     <div id="dashboard-page4" class="dashboard"></div>
 </div>
 
-<!-- PAGE 5 -->
-<div id="page5" class="page active">
+<!-- PAGE 5 - Safety Faults-->
+<div id="page5" class="page">
     <div id="dashboard-page5" class="dashboard"></div>
 </div>
 
-<!-- PAGE 6 -->
+<!-- PAGE 6 - MISC Sensors -->
 <div id="page6" class="page">
     <div id="dashboard-page6" class="dashboard"></div>
 </div>
 
-<!-- PAGE 7 -->
-<div id="page7" class="page active">
+<!-- PAGE 7 - Fuses -->
+<div id="page7" class="page">
     <div id="dashboard-page7" class="dashboard"></div>
 </div>
 
-<!-- PAGE 8 -->
-<div id="page8" class="page active">
-    <div id="dashboard-page7" class="dashboard"></div>
-    <button onclick="">File Transfer</button>
-    <button onclick="">Live Data</button>
+<!-- PAGE 8 - File Transfer -->
+<div id="page8" class="page">
+    <div id="dashboard-page8" class="dashboard"></div>
+</div>
+
+<!-- PAGE 9 - Code Switch -->
+<div id="page9" class="page">
+    <div id="dashboard-page9" class="dashboard"></div>
+    <form action="/submit" method="post">
+
+        <select name="File Name" required>
+            <option>Pedal_lo</option>
+            <option>Accel_min</option>
+            <option>Coast_lo</option>
+            <option>Coast_hi</option>
+            <option>Accel_max</option>
+            <option>Pedal_hi</option>
+            <option>Sus_travel</option>
+            <option>Wheel_spd</option>
+            <option>Rotor_temp</option>
+            <option>Wheel_tmp</option>
+            <option>Steering_ang</option>
+            <option>Air_pressure</option>
+            <option>Fluid_tmp</option>
+            <option>Fuse_box</option>
+
+        </select>
+
+        <input type="text" name="Value" placeholder="Enter the changed value" required>
+        <input type="submit" value="Submit">
+
+    </form>
 
 </div>
 
+<!-- PAGE 10 - Live Data -->
+<div id="page10" class="page">
+    <div id="dashboard-page10" class="dashboard"></div>
+</div>
 
-<body>
-    <div id="container">
-        <div id="image_container">
-            <img src="Race_Car.png" usemap="#image-map">
-
-            <map name="image-map">
-                <area href = "#" alt="Front (Wheels + Suspension)" title="Front (Wheels + Suspension)" onclick="changeBackground(currentPage)" coords="203,158,64" shape="circle">
-                <area href = "#" alt="Back (Wheels + Suspension)" title="Back (Wheels + Suspension)" onclick="changeBackground(currentPage)" coords="633,148,68" shape="circle">
-            </map>
-        </div>
-    </div>
-</body>
 
 <script>
 /* ===============================
@@ -226,7 +250,11 @@ const pages = {
     page7: [
         'Fuse 1', 'Fuse 2', 'Fuse 3', 'Fuse 4', 'Fuse 5', 'Fuse 6',
         'Fuse 7', 'Fuse 8', 'Fuse 9', 'Fuse 10', 'Fuse 11', 'Fuse 12', 'Fuse 13'
-    ]
+    ], 
+    page8: [],
+    page9: [],
+    page10: []
+
 };
 
 
@@ -253,25 +281,6 @@ function buildDashboard(pageId) {
     });
 }
 
-function changeBackground(pageId) {
-    const container = document.getElementById(`dashboard-${pageId}`);
-    container.innerHTML = "";
-
-    pages[pageId].forEach(label => {
-        const index = columnNames.indexOf(label);
-        if (index === -1) return;
-
-        const card = document.createElement("div");
-        card.className = "card2";
-        card.innerHTML = `
-            <div class="label">${label}</div>
-            <div class="value" id="${pageId}-val-${index}">-</div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-
 buildDashboard("page1");
 buildDashboard("page2");
 buildDashboard("page3");
@@ -279,6 +288,10 @@ buildDashboard("page4");
 buildDashboard("page5");
 buildDashboard("page6");
 buildDashboard("page7");
+buildDashboard("page8");
+buildDashboard("page9");
+buildDashboard("page10");
+
 
 /* ===============================
    PAGE SWITCHING
