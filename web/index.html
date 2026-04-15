@@ -152,14 +152,8 @@
 <!-- PAGE 8 - File Transfer -->
 <div id="page8" class="page">
     <div id="dashboard-page8" class="dashboard"></div>
-</div>
-
-<!-- PAGE 9 - Code Switch -->
-<div id="page9" class="page">
-    <div id="dashboard-page9" class="dashboard"></div>
-    <form action="/submit" method="post">
-
-        <select name="File Name" required>
+    <form onsubmit="sendData(event)">
+        <select name="fileName" required>
             <option>Pedal_lo</option>
             <option>Accel_min</option>
             <option>Coast_lo</option>
@@ -174,21 +168,78 @@
             <option>Air_pressure</option>
             <option>Fluid_tmp</option>
             <option>Fuse_box</option>
-
         </select>
 
-        <input type="text" name="Value" placeholder="Enter the changed value" required>
+        <input type="text" name="value" required>
         <input type="submit" value="Submit">
-
     </form>
-
 </div>
+
+<!-- PAGE 9 - Code Switch -->
+<div id="page9" class="page">
+    <div id="dashboard-page9" class="dashboard"></div>
+    <form onsubmit="sendData(event)">
+        <select name="fileName" required>
+            <option>Pedal_lo</option>
+            <option>Accel_min</option>
+            <option>Coast_lo</option>
+            <option>Coast_hi</option>
+            <option>Accel_max</option>
+            <option>Pedal_hi</option>
+            <option>Sus_travel</option>
+            <option>Wheel_spd</option>
+            <option>Rotor_temp</option>
+            <option>Wheel_tmp</option>
+            <option>Steering_ang</option>
+            <option>Air_pressure</option>
+            <option>Fluid_tmp</option>
+            <option>Fuse_box</option>
+        </select>
+
+        <input type="text" name="value" required>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
 
 <!-- PAGE 10 - Live Data -->
 <div id="page10" class="page">
     <div id="dashboard-page10" class="dashboard"></div>
 </div>
 
+
+<script>
+    const fileMap = {
+        "Pedal_lo": 0xc1,
+        "Accel_min": 0xc2,
+        "Coast_lo": 0xc3,
+        "Coast_hi": 0xc4,
+        "Accel_max": 0xc5,
+        "Pedal_hi": 0xc6,
+        "Sus_travel": 0xc7,
+        "Wheel_spd": 0xc8,
+        "Rotor_temp": 0xc9,
+        "Wheel_tmp": 0xca,
+        "Steering_ang": 0xcb,
+        "Air_pressure": 0xcc,
+        "Fluid_tmp": 0xcd,
+        "Fuse_box": 0xce
+    };
+</script>
+
+
+<script>
+function sendData(e) {
+    e.preventDefault();
+
+    const name = document.querySelector('[name="fileName"]').value;
+    const value = document.querySelector('[name="value"]').value;
+
+    const code = fileMap[name];   // 🔥 convert to hex code
+
+    eel.send_to_esp32(code, value);
+}
+</script>
 
 <script>
 /* ===============================
@@ -308,6 +359,7 @@ function showPage(pageId) {
 /* ===============================
    PYTHON → JS (EEL)
    =============================== */
+   
 
 eel.expose(update_status);
 function update_status(msg, color) {
@@ -315,6 +367,7 @@ function update_status(msg, color) {
     el.innerText = msg;
     el.style.color = color;
 }
+
 
 eel.expose(update_sensor_data);
 function update_sensor_data(data) {
