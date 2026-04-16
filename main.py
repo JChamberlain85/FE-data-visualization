@@ -1,5 +1,6 @@
 import eel
 import socket
+import requests
 import threading
 import pandas as pd
 import csv
@@ -19,12 +20,6 @@ PORT = 80
 TARGET_COUNT = 71 
 CSV_FILE = 'fe_sample.csv'
 eel.init('web')
-eel.start(
-    'index.html',
-    size=(width, height),
-    position=(100, 100),
-    block=True
-)
 
 
 f = open(CSV_FILE, "w+")
@@ -178,6 +173,21 @@ def get_csv_data():
             return file.read()
     except Exception as e:
         return f"Error: {e}"
+    
+@eel.expose
+def send_to_esp32(fileName, value):
+    print(fileName, value)
+    try:
+        requests.post(f"{IP_ADDRESS}/submit", data={
+            "fileName": fileName,
+            "value": value,
+        })
+
+        return "OK"
+    except Exception as e:
+        print(e)
+        return "ERROR"
+
 
 if __name__ == '__main__':
     #Start data thread
@@ -186,7 +196,7 @@ if __name__ == '__main__':
  
     #init Eel
     try:
-        eel.start('index.html', mode='default', size=(1000, 800), block=False)
+        eel.start('index.html', size=(width, height), block=True)
 
     except (SystemExit, KeyboardInterrupt):
         print("Closing App...")
