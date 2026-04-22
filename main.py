@@ -4,15 +4,6 @@ import requests
 import threading
 import pandas as pd
 import csv
-from screeninfo import get_monitors
-
-monitor = get_monitors()
-monitors = get_monitors()
-for monitor in monitors:
-    width = monitor.width
-    height = monitor.height
-
-
 
 #CONFIG
 IP_ADDRESS = "192.168.4.1"
@@ -176,17 +167,27 @@ def get_csv_data():
     
 @eel.expose
 def send_to_esp32(fileName, value):
-    print(fileName, value)
-    try:
-        requests.post(f"{IP_ADDRESS}/submit", data={
-            "fileName": fileName,
-            "value": value,
-        })
+    if fileName:
+        print(fileName, value)
+        try:
+            requests.post(f"{IP_ADDRESS}/submit", data={
+                "fileName": fileName,
+                "value": value,
+            })
 
-        return "OK"
-    except Exception as e:
-        print(e)
-        return "ERROR"
+            return "OK"
+        except Exception as e:
+            print(e)
+            return "ERROR"
+    else:
+        print(value)
+        try:
+            requests.post(f"{IP_ADDRESS}/submit", data={"value": value})
+            return "OK"
+        except Exception as e:
+            print(e)
+            return "ERROR"
+    
 
 
 if __name__ == '__main__':
@@ -196,7 +197,7 @@ if __name__ == '__main__':
  
     #init Eel
     try:
-        eel.start('index.html', size=(width, height), block=True)
+        eel.start('index.html', size=(1000, 800), block=True)
 
     except (SystemExit, KeyboardInterrupt):
         print("Closing App...")
