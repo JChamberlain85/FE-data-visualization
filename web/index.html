@@ -152,32 +152,93 @@
 <!-- PAGE 8 - File Transfer -->
 <div id="page8" class="page">
     <div id="dashboard-page8" class="dashboard"></div>
-    <form onsubmit="sendData(event)">
+    <form onsubmit="sendDataF(event)">
+
         <select name="fileName" required>
-            <option>Pedal_lo</option>
-            <option>Accel_min</option>
-            <option>Coast_lo</option>
-            <option>Coast_hi</option>
-            <option>Accel_max</option>
-            <option>Pedal_hi</option>
-            <option>Sus_travel</option>
-            <option>Wheel_spd</option>
-            <option>Rotor_temp</option>
-            <option>Wheel_tmp</option>
-            <option>Steering_ang</option>
-            <option>Air_pressure</option>
-            <option>Fluid_tmp</option>
-            <option>Fuse_box</option>
+            <option>Time (Low Bytes)</option>
+            <option>Suspension travel FR</option>
+            <option>Wheel Speed FR</option>
+            <option>Rotor Temp FR</option>
+            <option>Wheel temp FR</option>
+            <option>Steering Angle FL</option>
+            <option>Suspension travel FL</option>
+            <option>Wheel Speed FL</option>
+            <option>Rotor Temp FL</option>
+            <option>Wheel temp FL</option>
+            <option>Air Pressure FL</option>
+            <option>Suspension travel BR</option>
+            <option>Wheel Speed BR</option>
+            <option>Rotor Temp BR</option>
+            <option>Wheel temp BR</option>
+            <option>Air Pressure BR</option>
+            <option>Suspension travel BL</option>
+            <option>Wheel Speed BL</option>
+            <option>Rotor Temp BL</option>
+            <option>Wheel temp BL</option>
+            <option>Fluid Temp BL</option>
+            <option>Fusebox Sensor 1</option>
+            <option>Fusebox Sensor 2</option>
+            <option>Fusebox Sensor 3</option>
+            <option>Fusebox Sensor 4</option>
+            <option>Fusebox Sensor 5</option>
+            <option>Fusebox Sensor 6</option>
+            <option>Fusebox Sensor 7</option>
+            <option>Fusebox Sensor 8</option>
+            <option>Fusebox Sensor 9</option>
+            <option>Fusebox Voltage sensor</option>
+            <option>Throttle 1 Raw</option>
+            <option>Throttle 2 Raw</option>
+            <option>Throttle 1</option>
+            <option>Throttle 2</option>
+            <option>Front Brake Raw</option>
+            <option>Rear Brake Raw</option>
+            <option>Motor Controller temp</option>
+            <option>Motor Temp</option>
+            <option>Battery Temp</option>
+            <option>Low Volt Battery Temp</option>
+            <option>Motor Speed</option>
+            <option>Battery Voltage</option>
+            <option>Current Drive Mode</option>
+            <option>Ignition One state</option>
+            <option>Ignition Two State</option>
+            <option>Ams Fault Can</option>
+            <option>IMD Fault Can</option>
+            <option>BSPD Fault</option>
+            <option>Brake Light</option>
+            <option>Phase A Current</option>
+            <option>Phase B Current</option>
+            <option>Phase C Current</option>
+            <option>DC Bus Current</option>
+            <option>Commanded Torque</option>
+            <option>Torque Feedback</option>
+            <option>Soft Plausibility</option>
+            <option>High Sense</option>
+            <option>Current Car State</option>
+            <option>QBAI</option>
+            <option>Plausibility Fault</option>
+            <option>Hard Brake</option>
+            <option>Shut Down Circuit</option>
+            <option>Battery State Of Charge</option>
+            <option>Battery Current</option>
+            <option>Torque</option>
+            <option>Difference in Two throttles</option>
+            <option>Fault codes</option>
+            <option>GPS Position</option>
+            <option>GPS Velocity</option>
+            <option>GPS Time</option>
+            <option>Time (High Bytes)</option>
+
         </select>
 
-        <input type="submit" value="Submit">
+        <input type="hidden" name="value" value=0xF0>
+        <button type="submit">Submit</button>
     </form>
 </div>
 
 <!-- PAGE 9 - Code Switch -->
 <div id="page9" class="page">
     <div id="dashboard-page9" class="dashboard"></div>
-    <form onsubmit="sendData(event)">
+    <form onsubmit="sendDataC(event)">
         <select name="fileName" required>
             <option>Pedal_lo</option>
             <option>Accel_min</option>
@@ -195,7 +256,7 @@
             <option>Fuse_box</option>
         </select>
 
-        <input type="text" name="value" required>
+        <input type="text" name="inputValue" required>
         <input type="submit" value="Submit">
     </form>
 </div>
@@ -208,7 +269,37 @@
 
 
 <script>
-    const fileMap = {
+function sendDataF(e) {
+    e.preventDefault();
+
+    const form = event.target
+
+    const name = form.fileName.value;
+    
+    const code = fileMapFTransfer[name];
+    
+    eel.send_to_esp32(code, value);
+}
+</script>
+
+<script>
+function sendDataC(e) {
+    e.preventDefault();
+
+    const form = event.target
+
+    const name = form.fileName.value;
+    const value = form.inputValue ? form.inputValue.value : null;
+
+    const code = fileMapCTransfer[name];
+
+    eel.send_to_esp32(code, value);
+}
+</script>
+
+
+<script>
+    const fileMapCTransfer = {
         "Pedal_lo": 0xc1,
         "Accel_min": 0xc2,
         "Coast_lo": 0xc3,
@@ -226,19 +317,84 @@
     };
 </script>
 
-
 <script>
-function sendData(e) {
-    e.preventDefault();
-
-    const name = document.querySelector('[name="fileName"]').value;
-    const value = document.querySelector('[name="value"]').value;
-
-    const code = fileMap[name];   // 🔥 convert to hex code
-
-    eel.send_to_esp32(code, value);
-}
+    const fileMapFTransfer = {
+        "Time (Low Bytes)": 0x0000,
+        "Suspension travel FR": 0x0001,
+        "Wheel Speed FR": 2,
+        "Rotor Temp FR": 3,
+        "Wheel temp FR": 4,
+        "Steering Angle FL": 5,
+        "Suspension travel FL": 6,
+        "Wheel Speed FL": 7,
+        "Rotor Temp FL": 8,
+        "Wheel temp FL": 9,
+        "Air Pressure FL": 10,
+        "Suspension travel BR": 11,
+        "Wheel Speed BR": 12,
+        "Rotor Temp BR": 13,
+        "Wheel temp BR": 14,
+        "Air Pressure BR": 15,
+        "Suspension travel BL": 16,
+        "Wheel Speed BL": 17,
+        "Rotor Temp BL": 18,
+        "Wheel temp BL": 19,
+        "Fluid Temp BL": 20,
+        "Fusebox Sensor 1": 21,
+        "Fusebox Sensor 2": 22,
+        "Fusebox Sensor 3": 23,
+        "Fusebox Sensor 4": 24,
+        "Fusebox Sensor 5": 25,
+        "Fusebox Sensor 6": 26,
+        "Fusebox Sensor 7": 27,
+        "Fusebox Sensor 8": 28,
+        "Fusebox Sensor 9": 29,
+        "Fusebox Voltage sensor": 30,
+        "Throttle 1 Raw": 31,
+        "Throttle 2 Raw": 32,
+        "Throttle 1": 33,
+        "Throttle 2": 34,
+        "Front Brake Raw": 35,
+        "Rear Brake Raw": 36,
+        "Motor Controller temp": 37,
+        "Motor Temp": 38,
+        "Battery Temp": 39,
+        "Low Volt Battery Temp": 40,
+        "Motor Speed": 41,
+        "Battery Voltage": 42,
+        "Current Drive Mode": 43,
+        "Ignition One state": 44,
+        "Ignition Two State": 45,
+        "Ams Fault Can": 46,
+        "IMD Fault Can": 47,
+        "BSPD Fault": 48,
+        "Brake Light": 49,
+        "Phase A Current": 50,
+        "Phase B Current": 51,
+        "Phase C Current": 52,
+        "DC Bus Current": 53,
+        "Commanded Torque": 54,
+        "Torque Feedback": 55,
+        "Soft Plausibility": 56,
+        "High Sense": 57,
+        "Current Car State": 58,
+        "QBAI": 59,
+        "Plausibility Fault": 60,
+        "Hard Brake": 61,
+        "Shut Down Circuit": 62,
+        "Battery State Of Charge": 63,
+        "Battery Current": 64,
+        "Torque": 65,
+        "Difference in Two throttles": 66,
+        "Fault codes": 67,
+        "GPS Position": 68,
+        "GPS Velocity": 69,
+        "GPS Time": 70,
+        "Time (High Bytes)": 71
+    };
 </script>
+
+
 
 <script>
 /* ===============================
