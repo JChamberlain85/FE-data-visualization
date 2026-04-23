@@ -1,0 +1,14 @@
+>Submit button 
+	sends 0xF0
+	a script runs that receives all the file names and appends them to a select list in fileTransfer
+	Onclick:
+		pop up with a previously hidden select list containing all the filenames
+		pop up with the data point list that's already made
+		sends the filename along with the data point converted to 2 bytes
+		win?
+		
+
+a = 5
+
+res = a.to_bytes(2, 'big')  # length: 2 bytes, byte order: Big-endian
+print(res)
